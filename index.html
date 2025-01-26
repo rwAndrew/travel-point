@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="1.ico" type="image/x-icon" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:image" content="https://cdn.discordapp.com/attachments/1200384135739494412/1333125923020738581/kingston-logo_1.png?ex=6797c1c4&is=67967044&hm=12f341c060640f74b1bffa0924e3f65d9b723456654e8be9dceaed682d112fce&>">
+  <title>東京行</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #1e1e1e; /* 預設為暗色背景 */
+      color: #f4f4f4; /* 預設為亮色文字 */
+    }
+    h1 {
+      text-align: center;
+      color: inherit;
+    }
+    .date-section {
+      background-color: #333; /* 暗色模式下的背景 */
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* 暗色模式下的陰影 */
+      margin-bottom: 20px;
+      padding: 15px;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+    .date-section h2 {
+      margin: 0;
+      color: inherit;
+      cursor: pointer; /* 讓標題欄顯示為可點擊 */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .details {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      border-top: 1px solid #555; /* 暗色模式下的邊框 */
+      transition: border-color 0.3s;
+    }
+    .details textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      border: 1px solid #555; /* 暗色模式下的邊框 */
+      border-radius: 4px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      background-color: #444; /* 暗色模式下的背景 */
+      color: #f4f4f4; /* 暗色模式下的文字 */
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      display: none; /* 預設隱藏 */
+    }
+    .markdown-preview {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #444;
+      border-radius: 4px;
+      border: 1px solid #555;
+    }
+    .edit-title {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      display: none; /* 預設隱藏 */
+    }
+    .edit-title:hover {
+      background-color: #1976D2;
+    }
+    .delete-section {
+      background-color: #ff4444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      display: none; /* 預設隱藏 */
+    }
+    .delete-section:hover {
+      background-color: #cc0000;
+    }
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+      gap: 10px; /* 按鈕之間的間距 */
+    }
+    .add-section {
+      background-color: #5c91d6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .add-section:hover {
+      background-color: #45a049;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+  </style>
+</head>
+<body>
+  <h1>東京行程規劃</h1>
+
+  <!-- 滑動開關和新增欄位按鈕 -->
+  <div class="toggle-switch">
+    <label for="edit-mode">編輯模式：</label>
+    <label class="switch">
+      <input type="checkbox" id="edit-mode">
+      <span class="slider"></span>
+    </label>
+    <button class="add-section" onclick="addDateSection()">新增欄位</button>
+  </div>
+
+  <!-- 行程日期區塊 -->
+  <div id="sections-container">
+    <!-- 動態生成的日期區塊會放在這裡 -->
+  </div>
+
+  <!-- 引入 marked.js 來解析 Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    // 儲存資料的鍵名
+    const STORAGE_KEY = 'tokyo_trip_plan';
+
+    // 切換詳細內容顯示
+    function toggleDetails(title) {
+      const details = title.parentElement.querySelector('.details');
+      details.style.display = details.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // 編輯模式切換
+    const editMode = document.getElementById('edit-mode');
+    editMode.addEventListener('change', function() {
+      const isEditMode = this.checked;
+      // 顯示或隱藏 textarea、編輯標題按鈕和刪除按鈕
+      document.querySelectorAll('.details textarea').forEach(textarea => {
+        textarea.style.display = isEditMode ? 'block' : 'none';
+      });
+      document.querySelectorAll('.edit-title').forEach(button => {
+        button.style.display = isEditMode ? 'inline-block' : 'none';
+      });
+      document.querySelectorAll('.delete-section').forEach(button => {
+        button.style.display = isEditMode ? 'inline-block' : 'none';
+      });
+
+      // 編輯模式關閉時，驗證並排序
+      if (!isEditMode) {
+        sortDateSections();
+        saveData(); // 自動儲存
+      }
+    });
+
+    // 渲染 Markdown 內容
+    function renderMarkdown(textarea) {
+      const markdownPreview = textarea.parentElement.querySelector('.markdown-preview');
+      markdownPreview.innerHTML = marked.parse(textarea.value);
+      saveData(); // 自動儲存
+    }
+
+    // 編輯標題
+    function editTitle(event, button) {
+      event.stopPropagation(); // 阻止事件冒泡
+      const titleSpan = button.previousElementSibling;
+      const newTitle = prompt('請輸入新的標題：', titleSpan.textContent);
+      if (newTitle) {
+        titleSpan.textContent = newTitle;
+        saveData(); // 自動儲存
+      }
+    }
+
+    // 刪除日期區塊
+    function deleteSection(event, button) {
+      event.stopPropagation(); // 阻止事件冒泡
+      const section = button.closest('.date-section');
+      section.remove();
+      saveData(); // 自動儲存
+    }
+
+    // 新增日期區塊
+    function addDateSection() {
+      const sectionsContainer = document.getElementById('sections-container');
+      const newSection = createDateSection('新日期', '');
+      sectionsContainer.appendChild(newSection);
+      saveData(); // 自動儲存
+    }
+
+    // 創建一個新的日期區塊
+    function createDateSection(title, content) {
+      const section = document.createElement('div');
+      section.className = 'date-section';
+      section.innerHTML = `
+        <h2 onclick="toggleDetails(this)">
+          <span>${title}</span>
+          <div>
+            <button class="edit-title" onclick="editTitle(event, this)">編輯標題</button>
+            <button class="delete-section" onclick="deleteSection(event, this)">刪除</button>
+          </div>
+        </h2>
+        <div class="details">
+          <textarea oninput="renderMarkdown(this)">${content}</textarea>
+          <div class="markdown-preview"></div>
+        </div>
+      `;
+      return section;
+    }
+
+    // 排序日期區塊
+    function sortDateSections() {
+      const container = document.getElementById('sections-container');
+      const sections = Array.from(container.querySelectorAll('.date-section'));
+
+      // 根據標題中的日期排序
+      sections.sort((a, b) => {
+        const dateA = a.querySelector('h2 span').textContent.match(/\d+\/\d+/)[0]; // 提取日期
+        const dateB = b.querySelector('h2 span').textContent.match(/\d+\/\d+/)[0]; // 提取日期
+        return new Date(dateA) - new Date(dateB); // 轉換為日期對象並比較
+      });
+
+      // 重新插入排序後的區塊
+      sections.forEach(section => container.appendChild(section));
+    }
+
+    // 儲存資料到 localStorage
+    function saveData() {
+      const sections = Array.from(document.querySelectorAll('.date-section'));
+      const data = sections.map(section => ({
+        title: section.querySelector('h2 span').textContent,
+        content: section.querySelector('textarea').value,
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // 從 localStorage 載入資料
+    function loadData() {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      const sectionsContainer = document.getElementById('sections-container');
+      sectionsContainer.innerHTML = ''; // 清空現有內容
+      data.forEach(item => {
+        const section = createDateSection(item.title, item.content);
+        sectionsContainer.appendChild(section);
+        renderMarkdown(section.querySelector('textarea')); // 渲染 Markdown
+      });
+    }
+
+    // 初始化：載入資料並渲染
+    loadData();
+  </script>
+</body>
+</html>
