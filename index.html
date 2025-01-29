@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" href="1.ico" type="image/x-icon" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta property="og:image" content="https://cdn.discordapp.com/attachments/1200384135739494412/1333125923020738581/kingston-logo_1.png?ex=6797c1c4&is=67967044&hm=12f341c060640f74b1bffa0924e3f65d9b723456654e8be9dceaed682d112fce&>">
-  <title>東京行</title>
+  <title>東京行程規劃</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -96,7 +93,7 @@
       gap: 10px; /* 按鈕之間的間距 */
     }
     .add-section {
-      background-color: #5c91d6;
+      background-color: #4CAF50;
       color: white;
       border: none;
       padding: 10px 20px;
@@ -146,6 +143,38 @@
     input:checked + .slider:before {
       transform: translateX(26px);
     }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #333;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    .modal input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background-color: #444;
+      color: #f4f4f4;
+    }
+    .modal button {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .modal button:hover {
+      background-color: #1976D2;
+    }
   </style>
 </head>
 <body>
@@ -166,56 +195,94 @@
     <!-- 動態生成的日期區塊會放在這裡 -->
   </div>
 
+  <!-- 自定義彈出框 -->
+  <div id="edit-modal" class="modal">
+    <input type="text" id="edit-input" placeholder="輸入新標題">
+    <button onclick="confirmEdit()">確認</button>
+    <button onclick="closeModal()">取消</button>
+  </div>
+
   <!-- 引入 marked.js 來解析 Markdown -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- 引入 Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
   <script>
-    // 儲存資料的鍵名
-    const STORAGE_KEY = 'tokyo_trip_plan';
+    // Firebase 配置
+    const firebaseConfig = {
+      apiKey: "AIzaSyC8ZuICX3j6tZ1-4T-q5aW7E0W_1NBc6gA",
+      authDomain: "japan-75b79.firebaseapp.com",
+      projectId: "japan-75b79",
+      storageBucket: "japan-75b79.firebasestorage.app",
+      messagingSenderId: "719245058006",
+      appId: "1:719245058006:web:7f0e7c3b1737b5ad28ce77"
+    };
 
-    // 切換詳細內容顯示
-    function toggleDetails(title) {
-      const details = title.parentElement.querySelector('.details');
-      details.style.display = details.style.display === 'block' ? 'none' : 'block';
+    // 初始化 Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // 儲存資料的集合名稱
+    const COLLECTION_NAME = 'trip_plans';
+
+    // 當前編輯的標題元素
+    let currentTitleElement = null;
+
+    // 顯示彈出框
+    function showModal(titleElement) {
+      currentTitleElement = titleElement;
+      document.getElementById('edit-input').value = titleElement.textContent;
+      document.getElementById('edit-modal').style.display = 'block';
     }
 
-    // 編輯模式切換
-    const editMode = document.getElementById('edit-mode');
-    editMode.addEventListener('change', function() {
-      const isEditMode = this.checked;
-      // 顯示或隱藏 textarea、編輯標題按鈕和刪除按鈕
-      document.querySelectorAll('.details textarea').forEach(textarea => {
-        textarea.style.display = isEditMode ? 'block' : 'none';
-      });
-      document.querySelectorAll('.edit-title').forEach(button => {
-        button.style.display = isEditMode ? 'inline-block' : 'none';
-      });
-      document.querySelectorAll('.delete-section').forEach(button => {
-        button.style.display = isEditMode ? 'inline-block' : 'none';
-      });
-
-      // 編輯模式關閉時，驗證並排序
-      if (!isEditMode) {
-        sortDateSections();
-        saveData(); // 自動儲存
-      }
-    });
-
-    // 渲染 Markdown 內容
-    function renderMarkdown(textarea) {
-      const markdownPreview = textarea.parentElement.querySelector('.markdown-preview');
-      markdownPreview.innerHTML = marked.parse(textarea.value);
-      saveData(); // 自動儲存
+    // 關閉彈出框
+    function closeModal() {
+      document.getElementById('edit-modal').style.display = 'none';
     }
 
-    // 編輯標題
-    function editTitle(event, button) {
-      event.stopPropagation(); // 阻止事件冒泡
-      const titleSpan = button.previousElementSibling;
-      const newTitle = prompt('請輸入新的標題：', titleSpan.textContent);
+    // 確認編輯
+    function confirmEdit() {
+      const newTitle = document.getElementById('edit-input').value;
       if (newTitle) {
-        titleSpan.textContent = newTitle;
-        saveData(); // 自動儲存
+        currentTitleElement.textContent = newTitle;
+        saveData(); // 同步到資料庫
       }
+      closeModal();
+    }
+
+    // 儲存資料到 Firestore
+    function saveData() {
+      const sections = Array.from(document.querySelectorAll('.date-section'));
+      const data = sections.map(section => ({
+        title: section.querySelector('h2 span').textContent,
+        content: section.querySelector('textarea').value,
+      }));
+
+      // 將資料儲存到 Firestore
+      db.collection(COLLECTION_NAME).doc('user_plan').set({ data })
+        .then(() => console.log('資料已儲存'))
+        .catch(error => console.error('儲存失敗：', error));
+    }
+
+    // 從 Firestore 讀取資料
+    function loadData() {
+      db.collection(COLLECTION_NAME).doc('user_plan').get()
+        .then(doc => {
+          if (doc.exists) {
+            const data = doc.data().data;
+            const sectionsContainer = document.getElementById('sections-container');
+            sectionsContainer.innerHTML = ''; // 清空現有內容
+            data.forEach(item => {
+              const section = createDateSection(item.title, item.content);
+              sectionsContainer.appendChild(section);
+              renderMarkdown(section.querySelector('textarea')); // 渲染 Markdown
+            });
+          } else {
+            console.log('沒有找到資料，初始化一個空資料');
+            db.collection(COLLECTION_NAME).doc('user_plan').set({ data: [] });
+          }
+        })
+        .catch(error => console.error('讀取失敗：', error));
     }
 
     // 刪除日期區塊
@@ -223,7 +290,7 @@
       event.stopPropagation(); // 阻止事件冒泡
       const section = button.closest('.date-section');
       section.remove();
-      saveData(); // 自動儲存
+      saveData(); // 同步到 Firestore
     }
 
     // 新增日期區塊
@@ -231,7 +298,7 @@
       const sectionsContainer = document.getElementById('sections-container');
       const newSection = createDateSection('新日期', '');
       sectionsContainer.appendChild(newSection);
-      saveData(); // 自動儲存
+      saveData(); // 同步到 Firestore
     }
 
     // 創建一個新的日期區塊
@@ -254,46 +321,17 @@
       return section;
     }
 
-    // 排序日期區塊
-    function sortDateSections() {
-      const container = document.getElementById('sections-container');
-      const sections = Array.from(container.querySelectorAll('.date-section'));
-
-      // 根據標題中的日期排序
-      sections.sort((a, b) => {
-        const dateA = a.querySelector('h2 span').textContent.match(/\d+\/\d+/)[0]; // 提取日期
-        const dateB = b.querySelector('h2 span').textContent.match(/\d+\/\d+/)[0]; // 提取日期
-        return new Date(dateA) - new Date(dateB); // 轉換為日期對象並比較
-      });
-
-      // 重新插入排序後的區塊
-      sections.forEach(section => container.appendChild(section));
-    }
-
-    // 儲存資料到 localStorage
-    function saveData() {
-      const sections = Array.from(document.querySelectorAll('.date-section'));
-      const data = sections.map(section => ({
-        title: section.querySelector('h2 span').textContent,
-        content: section.querySelector('textarea').value,
-      }));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    // 從 localStorage 載入資料
-    function loadData() {
-      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      const sectionsContainer = document.getElementById('sections-container');
-      sectionsContainer.innerHTML = ''; // 清空現有內容
-      data.forEach(item => {
-        const section = createDateSection(item.title, item.content);
-        sectionsContainer.appendChild(section);
-        renderMarkdown(section.querySelector('textarea')); // 渲染 Markdown
-      });
+    // 渲染 Markdown 內容
+    function renderMarkdown(textarea) {
+      const markdownPreview = textarea.parentElement.querySelector('.markdown-preview');
+      markdownPreview.innerHTML = marked.parse(textarea.value);
+      saveData(); // 同步到 Firestore
     }
 
     // 初始化：載入資料並渲染
-    loadData();
+    window.onload = function() {
+      loadData();
+    };
   </script>
 </body>
 </html>
