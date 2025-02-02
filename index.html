@@ -168,9 +168,9 @@
 
   <!-- 引入 marked.js 來解析 Markdown -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js';
+  import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js';
   
   <script>
     // Firebase 配置代碼
