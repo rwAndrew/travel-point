@@ -321,21 +321,20 @@
 
     // 從 localStorage 載入資料
     // 從 Firestore 載入資料
-    async function loadData() {
-      try {
-        const querySnapshot = await db.collection("trip_plans").orderBy("timestamp").get();
+    function loadData() {
+      db.collection("trip_plans").orderBy("timestamp").get().then((querySnapshot) => {
         const sectionsContainer = document.getElementById('sections-container');
         sectionsContainer.innerHTML = ''; // 清空現有內容
-
+  
         querySnapshot.forEach((doc) => {
           const item = doc.data();
           const section = createDateSection(item.title, item.content);
           sectionsContainer.appendChild(section);
           renderMarkdown(section.querySelector('textarea')); // 渲染 Markdown
         });
-      } catch (error) {
+      }).catch((error) => {
         console.error("載入資料失敗: ", error);
-      }
+      });
     }
 
 
