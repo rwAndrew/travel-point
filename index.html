@@ -15,10 +15,12 @@
       background-color: #1e1e1e; /* 預設為暗色背景 */
       color: #f4f4f4; /* 預設為亮色文字 */
     }
+
     h1 {
       text-align: center;
       color: inherit;
     }
+
     .date-section {
       background-color: #333; /* 暗色模式下的背景 */
       border-radius: 8px;
@@ -27,6 +29,7 @@
       padding: 15px;
       transition: background-color 0.3s, box-shadow 0.3s;
     }
+
     .date-section h2 {
       margin: 0;
       color: inherit;
@@ -35,6 +38,7 @@
       align-items: center;
       justify-content: space-between;
     }
+
     .details {
       display: none;
       margin-top: 10px;
@@ -42,6 +46,7 @@
       border-top: 1px solid #555; /* 暗色模式下的邊框 */
       transition: border-color 0.3s;
     }
+
     .details textarea {
       width: 100%;
       height: 150px;
@@ -55,6 +60,7 @@
       transition: background-color 0.3s, color 0.3s, border-color 0.3s;
       display: none; /* 預設隱藏 */
     }
+
     .markdown-preview {
       margin-top: 10px;
       padding: 10px;
@@ -62,6 +68,7 @@
       border-radius: 4px;
       border: 1px solid #555;
     }
+
     .edit-title {
       background-color: #2196F3;
       color: white;
@@ -72,9 +79,11 @@
       font-size: 12px;
       display: none; /* 預設隱藏 */
     }
+
     .edit-title:hover {
       background-color: #1976D2;
     }
+
     .delete-section {
       background-color: #ff4444;
       color: white;
@@ -85,9 +94,11 @@
       font-size: 12px;
       display: none; /* 預設隱藏 */
     }
+
     .delete-section:hover {
       background-color: #cc0000;
     }
+
     .toggle-switch {
       display: flex;
       align-items: center;
@@ -95,6 +106,7 @@
       margin-bottom: 20px;
       gap: 10px; /* 按鈕之間的間距 */
     }
+
     .add-section {
       background-color: #5c91d6;
       color: white;
@@ -104,20 +116,24 @@
       cursor: pointer;
       font-size: 14px;
     }
+
     .add-section:hover {
       background-color: #45a049;
     }
+
     .switch {
       position: relative;
       display: inline-block;
       width: 60px;
       height: 34px;
     }
+
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -129,6 +145,7 @@
       transition: 0.4s;
       border-radius: 34px;
     }
+
     .slider:before {
       position: absolute;
       content: "";
@@ -140,14 +157,17 @@
       transition: 0.4s;
       border-radius: 50%;
     }
+
     input:checked + .slider {
       background-color: #2196F3;
     }
+
     input:checked + .slider:before {
       transform: translateX(26px);
     }
   </style>
 </head>
+
 <body>
   <h1>東京行程規劃</h1>
 
@@ -168,11 +188,11 @@
 
   <!-- 引入 marked.js 來解析 Markdown -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
   <script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js';
-  import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js';
-  
-  <script>
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js';
+
     // Firebase 配置代碼
     const firebaseConfig = {
       apiKey: "AIzaSyC8ZuICX3j6tZ1-4T-q5aW7E0W_1NBc6gA",
@@ -182,20 +202,18 @@
       messagingSenderId: "719245058006",
       appId: "1:719245058006:web:7f0e7c3b1737b5ad28ce77"
     };
-  
+
     // 初始化 Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(); // 初始化 Firestore 資料庫
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app); // 初始化 Firestore 資料庫
 
     // 確保在 Firebase 初始化後調用 loadData
     window.onload = function() {
       loadData();  // 這樣就能確保 Firebase 完全初始化後再呼叫載入資料的函式
     };
-  
+
     // 這裡可以用 db 來進行操作
-  </script>
-  
-  <script>
+
     // 儲存資料的鍵名
     const STORAGE_KEY = 'tokyo_trip_plan';
 
@@ -235,111 +253,80 @@
     }
 
     // 編輯標題
-    function editTitle(event, button) {
-      event.stopPropagation(); // 阻止事件冒泡
-      const titleSpan = button.previousElementSibling;
-      const newTitle = prompt('請輸入新的標題：', titleSpan.textContent);
+    function editTitle(button) {
+      const title = button.parentElement.querySelector('h2');
+      const newTitle = prompt('請輸入新的標題', title.textContent);
       if (newTitle) {
-        titleSpan.textContent = newTitle;
+        title.textContent = newTitle;
         saveData(); // 自動儲存
       }
     }
 
-    // 刪除日期區塊
-    function deleteSection(event, button) {
-      event.stopPropagation(); // 阻止事件冒泡
-      const section = button.closest('.date-section');
+    // 刪除行程
+    function deleteSection(button) {
+      const section = button.parentElement;
       section.remove();
       saveData(); // 自動儲存
     }
 
-    // 新增日期區塊
+    // 新增行程日期區塊
     function addDateSection() {
-      const sectionsContainer = document.getElementById('sections-container');
-      const newSection = createDateSection('新日期', '');
-      sectionsContainer.appendChild(newSection);
-      saveData(); // 自動儲存
-    }
-
-    // 創建一個新的日期區塊
-    function createDateSection(title, content) {
       const section = document.createElement('div');
-      section.className = 'date-section';
+      section.classList.add('date-section');
       section.innerHTML = `
-        <h2 onclick="toggleDetails(this)">
-          <span>${title}</span>
-          <div>
-            <button class="edit-title" onclick="editTitle(event, this)">編輯標題</button>
-            <button class="delete-section" onclick="deleteSection(event, this)">刪除</button>
-          </div>
-        </h2>
+        <h2 onclick="toggleDetails(this)">新行程日期 <button class="edit-title" style="display:none" onclick="editTitle(this)">編輯</button><button class="delete-section" style="display:none" onclick="deleteSection(this)">刪除</button></h2>
         <div class="details">
-          <textarea oninput="renderMarkdown(this)">${content}</textarea>
+          <textarea placeholder="請輸入行程內容..." oninput="renderMarkdown(this)"></textarea>
           <div class="markdown-preview"></div>
         </div>
       `;
-      return section;
+      document.getElementById('sections-container').appendChild(section);
+      sortDateSections(); // 每次新增行程後進行排序
     }
 
-    // 排序日期區塊
+    // 排序行程區塊
     function sortDateSections() {
-      const container = document.getElementById('sections-container');
-      const sections = Array.from(container.querySelectorAll('.date-section'));
-
-      // 根據標題中的日期排序
-      sections.sort((a, b) => {
-        const dateA = a.querySelector('h2 span').textContent.match(/\d+\/\d+/)[0]; // 提取日期
-        const dateB = b.querySelector('h2 span').textContent.match(/\d+\/\d+/)[0]; // 提取日期
-        return new Date(dateA) - new Date(dateB); // 轉換為日期對象並比較
-      });
-
-      // 重新插入排序後的區塊
-      sections.forEach(section => container.appendChild(section));
-    }
-
-    // 儲存資料到 localStorage
-    function saveData() {
       const sections = Array.from(document.querySelectorAll('.date-section'));
-      const data = sections.map(section => ({
-        title: section.querySelector('h2 span').textContent,
-        content: section.querySelector('textarea').value,
-      }));
-
-      // 儲存到 Firebase Firestore
-      data.forEach(item => {
-        db.collection("trip_plans").add({
-          title: item.title,
-          content: item.content,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp() // 儲存時間戳
-        }).then(() => {
-          console.log("資料已儲存到 Firebase");
-        }).catch((error) => {
-          console.error("儲存資料失敗: ", error);
-        });
+      sections.sort((a, b) => {
+        const titleA = a.querySelector('h2').textContent.trim();
+        const titleB = b.querySelector('h2').textContent.trim();
+        return titleA.localeCompare(titleB);
       });
+      sections.forEach(section => document.getElementById('sections-container').appendChild(section));
     }
 
-    // 從 localStorage 載入資料
-    // 從 Firestore 載入資料
+    // 儲存資料到本地存儲
+    function saveData() {
+      const sections = Array.from(document.querySelectorAll('.date-section')).map(section => {
+        return {
+          title: section.querySelector('h2').textContent.trim(),
+          content: section.querySelector('textarea').value.trim()
+        };
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sections));
+    }
+
+    // 載入資料
     function loadData() {
-      db.collection("trip_plans").orderBy("timestamp").get().then((querySnapshot) => {
-        const sectionsContainer = document.getElementById('sections-container');
-        sectionsContainer.innerHTML = ''; // 清空現有內容
-  
-        querySnapshot.forEach((doc) => {
-          const item = doc.data();
-          const section = createDateSection(item.title, item.content);
-          sectionsContainer.appendChild(section);
-          renderMarkdown(section.querySelector('textarea')); // 渲染 Markdown
+      const storedData = localStorage.getItem(STORAGE_KEY);
+      if (storedData) {
+        const sections = JSON.parse(storedData);
+        sections.forEach(section => {
+          const sectionElement = document.createElement('div');
+          sectionElement.classList.add('date-section');
+          sectionElement.innerHTML = `
+            <h2 onclick="toggleDetails(this)">${section.title} <button class="edit-title" style="display:none" onclick="editTitle(this)">編輯</button><button class="delete-section" style="display:none" onclick="deleteSection(this)">刪除</button></h2>
+            <div class="details">
+              <textarea placeholder="請輸入行程內容..." oninput="renderMarkdown(this)">${section.content}</textarea>
+              <div class="markdown-preview"></div>
+            </div>
+          `;
+          document.getElementById('sections-container').appendChild(sectionElement);
         });
-      }).catch((error) => {
-        console.error("載入資料失敗: ", error);
-      });
+        sortDateSections(); // 載入資料後進行排序
+      }
     }
-
-
-    // 初始化：載入資料並渲染
-    loadData();
   </script>
 </body>
+
 </html>
