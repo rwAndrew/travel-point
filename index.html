@@ -6,31 +6,126 @@
   <link rel="icon" href="1.ico" type="image/x-icon" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta property="og:image" content="https://cdn.discordapp.com/attachments/1200384135739494412/1333125923020738581/kingston-logo_1.png?ex=6797c1c4&is=67967044&hm=12f341c060640f74b1bffa0924e3f65d9b723456654e8be9dceaed682d112fce&">
-  <title>東京行程規劃</title>
+  <title>東京行</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
+      background-color: #1e1e1e; /* 預設為暗色背景 */
+      color: #f4f4f4; /* 預設為亮色文字 */
     }
 
     h1 {
       text-align: center;
+      color: inherit;
+    }
+
+    .date-section {
+      background-color: #333; /* 暗色模式下的背景 */
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* 暗色模式下的陰影 */
+      margin-bottom: 20px;
+      padding: 15px;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .date-section h2 {
+      margin: 0;
+      color: inherit;
+      cursor: pointer; /* 讓標題欄顯示為可點擊 */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .details {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      border-top: 1px solid #555; /* 暗色模式下的邊框 */
+      transition: border-color 0.3s;
+    }
+
+    .details textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      border: 1px solid #555; /* 暗色模式下的邊框 */
+      border-radius: 4px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      background-color: #444; /* 暗色模式下的背景 */
+      color: #f4f4f4; /* 暗色模式下的文字 */
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      display: none; /* 預設隱藏 */
+    }
+
+    .markdown-preview {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #444;
+      border-radius: 4px;
+      border: 1px solid #555;
+    }
+
+    .edit-title {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      display: none; /* 預設隱藏 */
+    }
+
+    .edit-title:hover {
+      background-color: #1976D2;
+    }
+
+    .delete-section {
+      background-color: #ff4444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      display: none; /* 預設隱藏 */
+    }
+
+    .delete-section:hover {
+      background-color: #cc0000;
     }
 
     .toggle-switch {
       display: flex;
-      justify-content: flex-start;
       align-items: center;
-      margin-bottom: 10px;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+      gap: 10px; /* 按鈕之間的間距 */
+    }
+
+    .add-section {
+      background-color: #5c91d6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .add-section:hover {
+      background-color: #45a049;
     }
 
     .switch {
       position: relative;
       display: inline-block;
-      width: 34px;
-      height: 20px;
-      margin-left: 10px;
+      width: 60px;
+      height: 34px;
     }
 
     .switch input {
@@ -54,88 +149,22 @@
     .slider:before {
       position: absolute;
       content: "";
-      height: 12px;
-      width: 12px;
-      border-radius: 50%;
+      height: 26px;
+      width: 26px;
       left: 4px;
       bottom: 4px;
       background-color: white;
       transition: 0.4s;
+      border-radius: 50%;
     }
 
-    input:checked+.slider {
+    input:checked + .slider {
       background-color: #2196F3;
     }
 
-    input:checked+.slider:before {
-      transform: translateX(14px);
+    input:checked + .slider:before {
+      transform: translateX(26px);
     }
-
-    .add-section {
-      margin-left: 20px;
-      padding: 8px 16px;
-      font-size: 16px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    .add-section:hover {
-      background-color: #45a049;
-    }
-
-    .date-section {
-      margin-top: 20px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      background-color: #f9f9f9;
-    }
-
-    .date-section h2 {
-      margin: 0;
-      padding: 10px;
-      background-color: #f1f1f1;
-      border-radius: 5px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .details {
-      display: none;
-      padding: 10px;
-    }
-
-    .details textarea {
-      width: 100%;
-      height: 150px;
-      margin-bottom: 10px;
-    }
-
-    .markdown-preview {
-      padding: 10px;
-      background-color: #f1f1f1;
-      border-radius: 5px;
-    }
-
-    .edit-title,
-    .delete-section {
-      background-color: #2196F3;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      margin-left: 5px;
-      cursor: pointer;
-    }
-
-    .edit-title:hover,
-    .delete-section:hover {
-      background-color: #0b7dda;
-    }
-
   </style>
 </head>
 
@@ -159,14 +188,7 @@
 
   <!-- 引入 marked.js 來解析 Markdown -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script>
-    function addDateSection() {
-      const sectionsContainer = document.getElementById('sections-container');
-      const newSection = createDateSection('新日期', '');
-      sectionsContainer.appendChild(newSection);
-      saveData(); // 自動儲存
-    }
-  </script>
+
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js';
     import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js';
@@ -185,9 +207,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app); // 初始化 Firestore 資料庫
 
+    // 確保在 Firebase 初始化後調用 loadData
     window.onload = function() {
-      loadData();  // 確保 Firebase 完全初始化後再呼叫載入資料的函式
+      loadData();  // 這樣就能確保 Firebase 完全初始化後再呼叫載入資料的函式
     };
+
+    // 這裡可以用 db 來進行操作
 
     // 儲存資料的鍵名
     const STORAGE_KEY = 'tokyo_trip_plan';
@@ -202,6 +227,7 @@
     const editMode = document.getElementById('edit-mode');
     editMode.addEventListener('change', function() {
       const isEditMode = this.checked;
+      // 顯示或隱藏 textarea、編輯標題按鈕和刪除按鈕
       document.querySelectorAll('.details textarea').forEach(textarea => {
         textarea.style.display = isEditMode ? 'block' : 'none';
       });
@@ -212,6 +238,7 @@
         button.style.display = isEditMode ? 'inline-block' : 'none';
       });
 
+      // 編輯模式關閉時，驗證並排序
       if (!isEditMode) {
         sortDateSections();
         saveData(); // 自動儲存
@@ -226,101 +253,85 @@
     }
 
     // 編輯標題
-    function editTitle(event, button) {
-      event.stopPropagation();
-      const titleSpan = button.previousElementSibling;
-      const newTitle = prompt('請輸入新的標題：', titleSpan.textContent);
+    function editTitle(button) {
+      const title = button.parentElement.querySelector('h2');
+      const newTitle = prompt('請輸入新的標題', title.textContent);
       if (newTitle) {
-        titleSpan.textContent = newTitle;
+        title.textContent = newTitle;
         saveData(); // 自動儲存
       }
     }
 
-    // 刪除日期區塊
-    function deleteSection(event, button) {
-      event.stopPropagation();
-      const section = button.closest('.date-section');
+    // 刪除行程
+    function deleteSection(button) {
+      const section = button.parentElement;
       section.remove();
       saveData(); // 自動儲存
     }
 
-    // 新增日期區塊
-
-
-    // 創建一個新的日期區塊
-    function createDateSection(title, content) {
+    // 新增行程日期區塊
+// 把 addDateSection 函數移到外面，確保它可以在全域範圍中訪問
+    function addDateSection() {
       const section = document.createElement('div');
-      section.className = 'date-section';
+      section.classList.add('date-section');
       section.innerHTML = `
-        <h2 onclick="toggleDetails(this)">
-          <span>${title}</span>
-          <div>
-            <button class="edit-title" onclick="editTitle(event, this)">編輯標題</button>
-            <button class="delete-section" onclick="deleteSection(event, this)">刪除</button>
-          </div>
-        </h2>
+        <h2 onclick="toggleDetails(this)">新行程日期 <button class="edit-title" style="display:none" onclick="editTitle(this)">編輯</button><button class="delete-section" style="display:none" onclick="deleteSection(this)">刪除</button></h2>
         <div class="details">
-          <textarea oninput="renderMarkdown(this)">${content}</textarea>
+          <textarea placeholder="請輸入行程內容..." oninput="renderMarkdown(this)"></textarea>
           <div class="markdown-preview"></div>
         </div>
       `;
-      return section;
+      document.getElementById('sections-container').appendChild(section);
+      sortDateSections(); // 每次新增行程後進行排序
     }
 
-    // 排序日期區塊
+    // 記得把原本的 window.onload 也刪除
+    window.onload = function() {
+      loadData();  // 確保 Firebase 完全初始化後再呼叫載入資料的函式
+    };
+
+    // 排序行程區塊
     function sortDateSections() {
-      const container = document.getElementById('sections-container');
-      const sections = Array.from(container.querySelectorAll('.date-section'));
-
-      sections.sort((a, b) => {
-        const dateA = a.querySelector('h2 span').textContent.match(/\d+\/\d+/)[0];
-        const dateB = b.querySelector('h2 span').textContent.match(/\d+\/\d+/)[0];
-        return new Date(dateA) - new Date(dateB);
-      });
-
-      sections.forEach(section => container.appendChild(section));
-    }
-
-    // 儲存資料到 Firestore
-    function saveData() {
       const sections = Array.from(document.querySelectorAll('.date-section'));
-      const data = sections.map(section => ({
-        title: section.querySelector('h2 span').textContent,
-        content: section.querySelector('textarea').value,
-      }));
-
-      data.forEach(item => {
-        db.collection("trip_plans").add({
-          title: item.title,
-          content: item.content,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          console.log("資料已儲存到 Firebase");
-        }).catch((error) => {
-          console.error("儲存資料失敗: ", error);
-        });
+      sections.sort((a, b) => {
+        const titleA = a.querySelector('h2').textContent.trim();
+        const titleB = b.querySelector('h2').textContent.trim();
+        return titleA.localeCompare(titleB);
       });
+      sections.forEach(section => document.getElementById('sections-container').appendChild(section));
     }
 
-    // 從 Firestore 載入資料
+    // 儲存資料到本地存儲
+    function saveData() {
+      const sections = Array.from(document.querySelectorAll('.date-section')).map(section => {
+        return {
+          title: section.querySelector('h2').textContent.trim(),
+          content: section.querySelector('textarea').value.trim()
+        };
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sections));
+    }
+
+    // 載入資料
     function loadData() {
-      db.collection("trip_plans").orderBy("timestamp").get().then((querySnapshot) => {
-        const sectionsContainer = document.getElementById('sections-container');
-        sectionsContainer.innerHTML = '';
-
-        querySnapshot.forEach((doc) => {
-          const item = doc.data();
-          const section = createDateSection(item.title, item.content);
-          sectionsContainer.appendChild(section);
-          renderMarkdown(section.querySelector('textarea'));
+      const storedData = localStorage.getItem(STORAGE_KEY);
+      if (storedData) {
+        const sections = JSON.parse(storedData);
+        sections.forEach(section => {
+          const sectionElement = document.createElement('div');
+          sectionElement.classList.add('date-section');
+          sectionElement.innerHTML = `
+            <h2 onclick="toggleDetails(this)">${section.title} <button class="edit-title" style="display:none" onclick="editTitle(this)">編輯</button><button class="delete-section" style="display:none" onclick="deleteSection(this)">刪除</button></h2>
+            <div class="details">
+              <textarea placeholder="請輸入行程內容..." oninput="renderMarkdown(this)">${section.content}</textarea>
+              <div class="markdown-preview"></div>
+            </div>
+          `;
+          document.getElementById('sections-container').appendChild(sectionElement);
         });
-      }).catch((error) => {
-        console.error("載入資料失敗: ", error);
-      });
+        sortDateSections(); // 載入資料後進行排序
+      }
     }
-
-    // 初始化：載入資料並渲染
-    loadData();
   </script>
 </body>
 
