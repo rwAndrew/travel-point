@@ -159,11 +159,19 @@
 
   <!-- 引入 marked.js 來解析 Markdown -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    function addDateSection() {
+      const sectionsContainer = document.getElementById('sections-container');
+      const newSection = createDateSection('新日期', '');
+      sectionsContainer.appendChild(newSection);
+      saveData(); // 自動儲存
+    }
+  </script>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js';
     import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js';
-  
-    // Firebase 初始化
+
+    // Firebase 配置代碼
     const firebaseConfig = {
       apiKey: "AIzaSyC8ZuICX3j6tZ1-4T-q5aW7E0W_1NBc6gA",
       authDomain: "japan-75b79.firebaseapp.com",
@@ -172,12 +180,10 @@
       messagingSenderId: "719245058006",
       appId: "1:719245058006:web:7f0e7c3b1737b5ad28ce77"
     };
-  
+
+    // 初始化 Firebase
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-  
-    // 綁定按鈕點擊事件
-    document.querySelector('.add-section').addEventListener('click', addDateSection);
+    const db = getFirestore(app); // 初始化 Firestore 資料庫
 
     window.onload = function() {
       loadData();  // 確保 Firebase 完全初始化後再呼叫載入資料的函式
@@ -239,12 +245,7 @@
     }
 
     // 新增日期區塊
-    function addDateSection() {
-      const sectionsContainer = document.getElementById('sections-container');
-      const newSection = createDateSection('新日期', '');
-      sectionsContainer.appendChild(newSection);
-      saveData(); // 自動儲存
-    }
+
 
     // 創建一個新的日期區塊
     function createDateSection(title, content) {
