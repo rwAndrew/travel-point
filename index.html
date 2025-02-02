@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <link rel="icon" href="1.ico" type="image/x-icon" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta property="og:image" content="https://cdn.discordapp.com/attachments/1200384135739494412/1333125923020738581/kingston-logo_1.png?ex=6797c1c4&is=67967044&hm=12f341c060640f74b1bffa0924e3f65d9b723456654e8be9dceaed682d112fce&>">
+  <meta property="og:image" content="https://cdn.discordapp.com/attachments/1200384135739494412/1333125923020738581/kingston-logo_1.png?ex=6797c1c4&is=67967044&hm=12f341c060640f74b1bffa0924e3f65d9b723456654e8be9dceaed682d112fce&">
   <title>東京行</title>
   <style>
     body {
@@ -171,9 +171,9 @@
   
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
-
+  
   <script>
-    // Firebase 配置代碼（這是你從 Firebase 控制台複製的部分）
+    // Firebase 配置代碼
     const firebaseConfig = {
       apiKey: "AIzaSyC8ZuICX3j6tZ1-4T-q5aW7E0W_1NBc6gA",
       authDomain: "japan-75b79.firebaseapp.com",
@@ -182,11 +182,14 @@
       messagingSenderId: "719245058006",
       appId: "1:719245058006:web:7f0e7c3b1737b5ad28ce77"
     };
-
-  // 初始化 Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore(); // 使用 Firestore 資料庫
+  
+    // 初始化 Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(); // 初始化 Firestore 資料庫
+  
+    // 這裡可以用 db 來進行操作
   </script>
+  
   <script>
     // 儲存資料的鍵名
     const STORAGE_KEY = 'tokyo_trip_plan';
@@ -312,8 +315,10 @@
     }
 
     // 從 localStorage 載入資料
-    function loadData() {
-      db.collection("trip_plans").orderBy("timestamp").get().then((querySnapshot) => {
+    // 從 Firestore 載入資料
+    async function loadData() {
+      try {
+        const querySnapshot = await db.collection("trip_plans").orderBy("timestamp").get();
         const sectionsContainer = document.getElementById('sections-container');
         sectionsContainer.innerHTML = ''; // 清空現有內容
 
@@ -323,10 +328,11 @@
           sectionsContainer.appendChild(section);
           renderMarkdown(section.querySelector('textarea')); // 渲染 Markdown
         });
-      }).catch((error) => {
+      } catch (error) {
         console.error("載入資料失敗: ", error);
-      });
+      }
     }
+
 
     // 初始化：載入資料並渲染
     loadData();
