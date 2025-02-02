@@ -270,6 +270,7 @@
     }
 
     // 新增行程日期區塊
+// 把 addDateSection 函數移到外面，確保它可以在全域範圍中訪問
     function addDateSection() {
       const section = document.createElement('div');
       section.classList.add('date-section');
@@ -283,6 +284,11 @@
       document.getElementById('sections-container').appendChild(section);
       sortDateSections(); // 每次新增行程後進行排序
     }
+
+    // 記得把原本的 window.onload 也刪除
+    window.onload = function() {
+      loadData();  // 確保 Firebase 完全初始化後再呼叫載入資料的函式
+    };
 
     // 排序行程區塊
     function sortDateSections() {
