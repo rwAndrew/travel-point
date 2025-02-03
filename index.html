@@ -1,299 +1,343 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" href="1.ico" type="image/x-icon" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta property="og:image" content="https://cdn.discordapp.com/attachments/1200384135739494412/1333125923020738581/kingston-logo_1.png?ex=6797c1c4&is=67967044&hm=12f341c060640f74b1bffa0924e3f65d9b723456654e8be9dceaed682d112fce&>">
-  <title>東京行</title>
+
+  <title>Tokyo Journey</title>
   <style>
+    /* 基本排版 */
     body {
-      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
       padding: 20px;
-      background-color: #1e1e1e; /* 預設為暗色背景 */
-      color: #f4f4f4; /* 預設為亮色文字 */
     }
     h1 {
       text-align: center;
-      color: inherit;
+      margin-bottom: 30px;
+      color: #80d8ff;
+      text-shadow: 0 0 10px rgba(128,216,255,0.7);
     }
-    .date-section {
-      background-color: #333; /* 暗色模式下的背景 */
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* 暗色模式下的陰影 */
-      margin-bottom: 20px;
-      padding: 15px;
-      transition: background-color 0.3s, box-shadow 0.3s;
-    }
-    .date-section h2 {
-      margin: 0;
-      color: inherit;
-      cursor: pointer; /* 讓標題欄顯示為可點擊 */
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .details {
-      display: none;
-      margin-top: 10px;
-      padding: 10px;
-      border-top: 1px solid #555; /* 暗色模式下的邊框 */
-      transition: border-color 0.3s;
-    }
-    .details textarea {
-      width: 100%;
-      height: 150px;
-      padding: 10px;
-      border: 1px solid #555; /* 暗色模式下的邊框 */
-      border-radius: 4px;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      background-color: #444; /* 暗色模式下的背景 */
-      color: #f4f4f4; /* 暗色模式下的文字 */
-      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-      display: none; /* 預設隱藏 */
-    }
-    .markdown-preview {
-      margin-top: 10px;
-      padding: 10px;
-      background-color: #444;
-      border-radius: 4px;
-      border: 1px solid #555;
-    }
-    .edit-title {
-      background-color: #2196F3;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      display: none; /* 預設隱藏 */
-    }
-    .edit-title:hover {
-      background-color: #1976D2;
-    }
-    .delete-section {
-      background-color: #ff4444;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      display: none; /* 預設隱藏 */
-    }
-    .delete-section:hover {
-      background-color: #cc0000;
-    }
-    .toggle-switch {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      margin-bottom: 20px;
-      gap: 10px; /* 按鈕之間的間距 */
-    }
-    .add-section {
-      background-color: #5c91d6;
-      color: white;
-      border: none;
-      padding: 10px 20px;
+    /* 日期標題 */
+    .day {
+      margin-bottom: 15px;
+      border: 1px solid #333;
       border-radius: 5px;
+      overflow: hidden;
+    }
+    .day-header {
+      background-color: #1f1f1f;
+      padding: 15px 20px;
       cursor: pointer;
+      position: relative;
+      transition: background-color 0.3s ease;
+    }
+    .day-header:hover {
+      background-color: #333;
+    }
+    .day-header::after {
+      content: '▼';
+      position: absolute;
+      right: 20px;
+      transition: transform 0.3s ease;
+    }
+    .day-header.active::after {
+      transform: rotate(-180deg);
+    }
+    .day-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+      background-color: #1a1a1a;
+      padding: 0 20px;
+    }
+    .day-content.active {
+      padding: 15px 20px;
+    }
+    /* 內容區塊 */
+    .section {
+      margin-bottom: 20px;
+    }
+    .section h3 {
+      margin-bottom: 10px;
+      color: #80d8ff;
+      text-shadow: 0 0 5px rgba(128,216,255,0.5);
+      border-bottom: 1px solid #333;
+      padding-bottom: 5px;
+    }
+    .section ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .section ul li {
+      line-height: 1.6;
+      margin-bottom: 5px;
       font-size: 14px;
     }
-    .add-section:hover {
-      background-color: #45a049;
+    ol {
+      margin: 0;
+      padding-left: 20px;
     }
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 34px;
+    /* 高科技動畫效果 */
+    .fadeIn {
+      animation: fadeIn 0.5s ease forwards;
     }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: 0.4s;
-      border-radius: 34px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 26px;
-      width: 26px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: 0.4s;
-      border-radius: 50%;
-    }
-    input:checked + .slider {
-      background-color: #2196F3;
-    }
-    input:checked + .slider:before {
-      transform: translateX(26px);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <h1>東京行程規劃</h1>
-
-  <!-- 滑動開關和新增欄位按鈕 -->
-  <div class="toggle-switch">
-    <label for="edit-mode">編輯模式：</label>
-    <label class="switch">
-      <input type="checkbox" id="edit-mode">
-      <span class="slider"></span>
-    </label>
-    <button class="add-section" onclick="addDateSection()">新增欄位</button>
-  </div>
-
-  <!-- 行程日期區塊 -->
-  <div id="sections-container">
-    <!-- 動態生成的日期區塊會放在這裡 -->
-  </div>
-
-  <!-- 引入 marked.js 來解析 Markdown -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script>
-    // 儲存資料的鍵名
-    const STORAGE_KEY = 'tokyo_trip_plan';
-
-    // 切換詳細內容顯示
-    function toggleDetails(title) {
-      const details = title.parentElement.querySelector('.details');
-      details.style.display = details.style.display === 'block' ? 'none' : 'block';
-    }
-
-    // 編輯模式切換
-    const editMode = document.getElementById('edit-mode');
-    editMode.addEventListener('change', function() {
-      const isEditMode = this.checked;
-      // 顯示或隱藏 textarea、編輯標題按鈕和刪除按鈕
-      document.querySelectorAll('.details textarea').forEach(textarea => {
-        textarea.style.display = isEditMode ? 'block' : 'none';
-      });
-      document.querySelectorAll('.edit-title').forEach(button => {
-        button.style.display = isEditMode ? 'inline-block' : 'none';
-      });
-      document.querySelectorAll('.delete-section').forEach(button => {
-        button.style.display = isEditMode ? 'inline-block' : 'none';
-      });
-
-      // 編輯模式關閉時，驗證並排序
-      if (!isEditMode) {
-        sortDateSections();
-        saveData(); // 自動儲存
-      }
-    });
-
-    // 渲染 Markdown 內容
-    function renderMarkdown(textarea) {
-      const markdownPreview = textarea.parentElement.querySelector('.markdown-preview');
-      markdownPreview.innerHTML = marked.parse(textarea.value);
-      saveData(); // 自動儲存
-    }
-
-    // 編輯標題
-    function editTitle(event, button) {
-      event.stopPropagation(); // 阻止事件冒泡
-      const titleSpan = button.previousElementSibling;
-      const newTitle = prompt('請輸入新的標題：', titleSpan.textContent);
-      if (newTitle) {
-        titleSpan.textContent = newTitle;
-        saveData(); // 自動儲存
-      }
-    }
-
-    // 刪除日期區塊
-    function deleteSection(event, button) {
-      event.stopPropagation(); // 阻止事件冒泡
-      const section = button.closest('.date-section');
-      section.remove();
-      saveData(); // 自動儲存
-    }
-
-    // 新增日期區塊
-    function addDateSection() {
-      const sectionsContainer = document.getElementById('sections-container');
-      const newSection = createDateSection('新日期', '');
-      sectionsContainer.appendChild(newSection);
-      saveData(); // 自動儲存
-    }
-
-    // 創建一個新的日期區塊
-    function createDateSection(title, content) {
-      const section = document.createElement('div');
-      section.className = 'date-section';
-      section.innerHTML = `
-        <h2 onclick="toggleDetails(this)">
-          <span>${title}</span>
-          <div>
-            <button class="edit-title" onclick="editTitle(event, this)">編輯標題</button>
-            <button class="delete-section" onclick="deleteSection(event, this)">刪除</button>
-          </div>
-        </h2>
-        <div class="details">
-          <textarea oninput="renderMarkdown(this)">${content}</textarea>
-          <div class="markdown-preview"></div>
+  <div class="container">
+    <h1>Tokyo Journey</h1>
+    
+    <!-- 2/4 -->
+    <div class="day">
+      <div class="day-header">2/4 抵達東京 - 入住 & 前往市區</div>
+      <div class="day-content">
+        <div class="section fadeIn">
+          <h3>成田機場 → 淺草簪飯店（THE KANZASHI TOKYO ASAKUSA）</h3>
+          <ul>
+            <li><strong>航班抵達時間：</strong>視實際班機而定</li>
+            <li><strong>入境 & 行李提領：</strong>約1小時（視人潮而定）</li>
+            <li><strong>交通方式：</strong>搭乘京成 Skyliner → 上野站 → 東京 Metro 銀座線 → 淺草站 → 步行</li>
+            <li><strong>預計通勤時間：</strong>約55分鐘</li>
+          </ul>
         </div>
-      `;
-      return section;
-    }
+        <div class="section fadeIn">
+          <h3>入住飯店 & 休息</h3>
+          <ul>
+            <li><strong>飯店：</strong>淺草簪飯店</li>
+            <li>若可提前入住，可稍作休息；否則寄放行李，輕裝出發</li>
+            <li><strong>休息時間：</strong>約30分鐘 - 1小時</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>淺草簪飯店 → CKEAKIN → ROX 百貨</h3>
+          <ul>
+            <li><strong>交通方式：</strong>步行或地鐵（依具體位置調整）</li>
+            <li><strong>預計步行時間：</strong>約10-15分鐘</li>
+            <li><strong>目的：</strong>ROX百貨：逛街、購物與用餐</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- 2/5 -->
+    <div class="day">
+      <div class="day-header">2/5 中野  華納哈利波特影城</div>
+      <div class="day-content">
+        <div class="section fadeIn">
+          <h3>淺草簪飯店 → 中野百老匯</h3>
+          <ul>
+            <li><strong>出發時間：</strong>上午8:30</li>
+            <li><strong>交通方式：</strong>從淺草站搭乘都營淺草線至新橋站，轉乘JR中央線快速至中野站</li>
+            <li><strong>預計通勤時間：</strong>約40分鐘</li>
+            <li><strong>預計到達時間：</strong>上午9:10</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>中野百老匯</h3>
+          <ul>
+            <li><strong>參觀時間：</strong>1小時30分鐘</li>
+            <li><strong>離開時間：</strong>上午10:40</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>中野百老匯 → 富士屋相機本店</h3>
+          <ul>
+            <li><strong>交通方式：</strong>步行</li>
+            <li><strong>預計步行時間：</strong>約5分鐘</li>
+            <li><strong>預計到達時間：</strong>上午10:45</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>富士屋相機本店</h3>
+          <ul>
+            <li><strong>參觀時間：</strong>45分鐘</li>
+            <li><strong>離開時間：</strong>上午11:30</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>富士屋相機本店 → 華納哈利波特影城</h3>
+          <ul>
+            <li><strong>交通方式：</strong>從中野站搭乘JR中央總武線至高田馬場站，轉乘西武新宿線至花小金井站，再搭乘巴士前往哈利波特影城</li>
+            <li><strong>預計通勤時間：</strong>約1小時</li>
+            <li><strong>預計到達時間：</strong>約中午12:30</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>華納哈利波特影城</h3>
+          <ul>
+            <li><strong>參觀時間：</strong>自由安排</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- 2/6 -->
+    <div class="day">
+      <div class="day-header">2/6 東京迪士尼海洋園區</div>
+      <div class="day-content">
+        <div class="section fadeIn">
+          <h3>淺草簪飯店 → 東京迪士尼海洋</h3>
+          <ul>
+            <li><strong>出發時間：</strong>上午8:30</li>
+            <li><strong>交通方式：</strong>
+              <ol>
+                <li>步行至淺草站</li>
+                <li>搭乘都營淺草線至八丁堀站</li>
+                <li>轉乘JR京葉線/武藏野線至舞濱站</li>
+                <li>轉乘迪士尼度假區線至東京迪士尼海洋站</li>
+              </ol>
+            </li>
+            <li><strong>預計通勤時間：</strong>約50分鐘</li>
+            <li><strong>預計到達時間：</strong>上午9:20</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
-    // 排序日期區塊
-    function sortDateSections() {
-      const container = document.getElementById('sections-container');
-      const sections = Array.from(container.querySelectorAll('.date-section'));
+    <!-- 2/7 -->
+    <div class="day">
+      <div class="day-header">2/7 輕井澤 OUTLET 購物行程</div>
+      <div class="day-content">
+        <div class="section fadeIn">
+          <h3>淺草簪飯店 → 輕井澤 OUTLET</h3>
+          <ul>
+            <li><strong>出發時間：</strong>上午8:30</li>
+            <li><strong>交通方式：</strong>
+              <ol>
+                <li>步行至淺草站</li>
+                <li>搭乘地鐵銀座線至上野站</li>
+                <li>轉乘JR北陸新幹線（Hakutaka/Asama號）至輕井澤站</li>
+                <li>步行5分鐘抵達輕井澤王子購物廣場</li>
+              </ol>
+            </li>
+            <li><strong>預計通勤時間：</strong>約1小時30分鐘</li>
+            <li><strong>預計到達時間：</strong>上午10:00</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
-      // 根據標題中的日期排序
-      sections.sort((a, b) => {
-        const dateA = a.querySelector('h2 span').textContent.match(/\d+\/\d+/)[0]; // 提取日期
-        const dateB = b.querySelector('h2 span').textContent.match(/\d+\/\d+/)[0]; // 提取日期
-        return new Date(dateA) - new Date(dateB); // 轉換為日期對象並比較
+    <!-- 2/8 -->
+    <div class="day">
+      <div class="day-header">2/8 東京都廳觀景台 & 新宿探索</div>
+      <div class="day-content">
+        <div class="section fadeIn">
+          <h3>淺草簪飯店 → 東京都廳觀景台</h3>
+          <ul>
+            <li><strong>出發時間：</strong>上午8:30</li>
+            <li><strong>交通方式：</strong>都營淺草線 → 新橋站 → 都營大江戶線 → 都廳前站</li>
+            <li><strong>預計通勤時間：</strong>約50分鐘</li>
+            <li><strong>預計到達時間：</strong>上午9:20</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>東京都廳觀景台</h3>
+          <ul>
+            <li><strong>參觀時間：</strong>1小時</li>
+            <li><strong>離開時間：</strong>上午10:20</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>新宿區探索</h3>
+          <ul>
+            <li><strong>新宿北村寫真機店：</strong>步行約20分鐘到達，參觀30分鐘</li>
+            <li><strong>新宿中古相機店：</strong>步行約10分鐘到達，參觀30分鐘</li>
+            <li><strong>三麗鷗新宿店：</strong>步行約10分鐘到達，參觀1小時</li>
+            <li><strong>花園神社：</strong>步行約10分鐘到達，參觀30分鐘</li>
+            <li><strong>阿美橫町：</strong>搭乘JR山手線約30分鐘到達，參觀自由安排</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2/9 -->
+    <div class="day">
+      <div class="day-header">2/9 川越市 + 秋葉原</div>
+      <div class="day-content">
+        <div class="section fadeIn">
+          <h3>淺草簪飯店 → 川越市</h3>
+          <ul>
+            <li><strong>出發時間：</strong>上午8:30</li>
+            <li><strong>交通方式：</strong>搭乘JR埼京線或東武東上線至川越站</li>
+            <li><strong>預計通勤時間：</strong>約1小時</li>
+            <li><strong>預計到達時間：</strong>上午9:30</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>川越市參觀</h3>
+          <ul>
+            <li>參觀時間：自由安排</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>川越市 → 秋葉原</h3>
+          <ul>
+            <li><strong>交通方式：</strong>搭乘JR埼京線或東武東上線返回秋葉原</li>
+            <li><strong>預計通勤時間：</strong>約1小時</li>
+            <li><strong>預計到達時間：</strong>下午2:00</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>秋葉原（電器街 + BIG CAMERA）</h3>
+          <ul>
+            <li><strong>參觀時間：</strong>2小時</li>
+            <li><strong>離開時間：</strong>下午4:00</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2/10 -->
+    <div class="day">
+      <div class="day-header">2/10 晴空塔 + 雷門</div>
+      <div class="day-content">
+        <div class="section fadeIn">
+          <h3>淺草簪飯店 → 晴空塔 + 雷門</h3>
+          <ul>
+            <li><strong>出發時間：</strong>上午8:30</li>
+            <li><strong>交通方式：</strong>從淺草站搭乘東武晴空塔線至東京晴空塔站，或步行約15分鐘</li>
+            <li><strong>預計通勤時間：</strong>約10分鐘（電車） / 約15分鐘（步行）</li>
+            <li><strong>預計到達時間：</strong>上午8:45</li>
+          </ul>
+        </div>
+        <div class="section fadeIn">
+          <h3>晴空塔 + 雷門參觀</h3>
+          <ul>
+            <li><strong>參觀時間：</strong>1小時30分鐘</li>
+            <li><strong>離開時間：</strong>上午10:15</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+  <script>
+    // 監聽每個 .day-header 的點擊事件，展開/收合內容
+    document.querySelectorAll('.day-header').forEach(header => {
+      header.addEventListener('click', function() {
+        this.classList.toggle('active');
+        const content = this.nextElementSibling;
+        if (content.style.maxHeight) {
+          content.style.maxHeight = null;
+          content.classList.remove('active');
+        } else {
+          content.style.maxHeight = content.scrollHeight + "px";
+          content.classList.add('active');
+        }
       });
-
-      // 重新插入排序後的區塊
-      sections.forEach(section => container.appendChild(section));
-    }
-
-    // 儲存資料到 localStorage
-    function saveData() {
-      const sections = Array.from(document.querySelectorAll('.date-section'));
-      const data = sections.map(section => ({
-        title: section.querySelector('h2 span').textContent,
-        content: section.querySelector('textarea').value,
-      }));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    // 從 localStorage 載入資料
-    function loadData() {
-      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      const sectionsContainer = document.getElementById('sections-container');
-      sectionsContainer.innerHTML = ''; // 清空現有內容
-      data.forEach(item => {
-        const section = createDateSection(item.title, item.content);
-        sectionsContainer.appendChild(section);
-        renderMarkdown(section.querySelector('textarea')); // 渲染 Markdown
-      });
-    }
-
-    // 初始化：載入資料並渲染
-    loadData();
+    });
   </script>
 </body>
 </html>
